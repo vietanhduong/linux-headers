@@ -5,6 +5,21 @@ on:
     tags:
       - v*
 
+permissions:
+  actions: read
+  checks: read
+  contents: write
+  deployments: read
+  id-token: read
+  issues: read
+  discussions: read
+  packages: write
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+
 jobs:
   prepare:
     name: Prepare
@@ -90,10 +105,8 @@ jobs:
             md+="* $version\n"
           done
 
-          md+="\n"
-
           target_arches=($(cat TARGET_ARCHES))
-          md="## Support Arch\n"
+          md+="\n## Support Arch\n"
           for version in "${target_arches[@]}"; do
             md+="* $version\n"
           done
