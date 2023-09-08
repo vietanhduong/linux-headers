@@ -1,0 +1,29 @@
+name: Release
+
+on: push
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-20.04
+    outputs:
+      kernel_versions: ${{ steps.kernel_versions.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Read Kernel Version
+        id: kernel_versions
+        run: |
+          echo "value=$(cat KERNEL_VERSIONS | jq -ncR '[inputs | select(length>0)]')" >> $GITHUB_OUTPUT
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    needs: prepare
+    strategy:
+      matrix:
+        arch: ["x86_64", "arm64"]
+        version: ${{ fromJson(needs.prepare.outputs.kernel_versions) }}
+    steps:
+      - name: test
+        run: |
+          echo "${{ matrix.arch }}: ${{ matrix.version }}"
