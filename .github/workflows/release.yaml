@@ -21,24 +21,40 @@ jobs:
     needs: prepare
     strategy:
       matrix:
+        version: ${{ fromJson(needs.prepare.outputs.kernel_versions ) }}
         arch: ["x86_64", "arm64"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: "Build with Target Arch: ${{ matrix.arch }}"
+      - name: "Build Kernel Version ${{ matrix.version }} Target Arch: ${{ matrix.arch }}"
         shell: bash
         run: |
-          KERNEL_VERSIONS=($(cat KERNEL_VERSIONS))
-          for version in "${KERNEL_VERSIONS[@]}"; do
-            docker buildx build --build-arg KERNEL_VERSION=${version} \
-              --build-arg ARCH="${{ matrix.arch }}" \
-              --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
-              -t "linux-headers:${version}-${{ matrix.arch }}" \
-              --cache-to type=gha \
-              --cache-from type=gha .
-            docker run --rm -v $PWD/.builds:/output linux-headeres:${version}-${{ matrix.arch }}
-          done
+          version="${{ matrix.version }}"
+          arch="${{ matrix.version }}"
+          docker buildx build --build-arg KERNEL_VERSION=${version} \
+            --build-arg ARCH="${arch}" \
+            --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
+            -t "linux-headers:${version}-${arch}" \
+            --cache-to type=gha \
+            --cache-from type=gha .
+          docker run --rm -v ${{ github.workspace }}/builds:/output linux-headers:${version}-${arch}
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          path: ${{ github.workspace }}/builds/linux-headers-${{ matrix.arch }}-${{ matrix.version }}.tar.gz
 
-          ls -lah $PWD/.builds
+  release:
+    name: Release
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          path: ${{ github.workspace }}/builds
+      - name: Test
+        run: ls -lah ${{ github.workspace }}/builds
