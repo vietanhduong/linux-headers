@@ -76,7 +76,7 @@ jobs:
         run: |
           ROOT_REPO=$(git rev-parse --show-toplevel)
           TARGET_ARCHES=($(cat $ROOT_REPO/TARGET_ARCHES))
-          for arch in "${TARGET_ARCHES}"; do
+          for arch in "${TARGET_ARCHES[@]}"; do
             tar -cvzf linux-headers-${arch}.tar.gz linux-headers-${arch}-*.tar.gz
             mv linux-headers-${arch}.tar.gz $ROOT_REPO
           done
@@ -89,7 +89,8 @@ jobs:
           for version in "${kernel_versions[@]}"; do
             md+="* $version\n"
           done
-          md += "\n"
+
+          md+="\n"
 
           target_arches=($(cat TARGET_ARCHES))
           md="## Support Arch\n"
