@@ -31,7 +31,7 @@ jobs:
         shell: bash
         run: |
           KERNEL_VERSIONS=($(cat KERNEL_VERSIONS))
-          for $version in "${KERNEL_VERSIONS[@]}"; do
+          for version in "${KERNEL_VERSIONS[@]}"; do
             docker buildx build --build-arg KERNEL_VERSION=${version} \
               --build-arg ARCH="${{ matrix.arch }}" \
               --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
