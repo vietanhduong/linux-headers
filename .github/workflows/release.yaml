@@ -15,6 +15,7 @@ jobs:
         id: kernel_versions
         run: |
           echo "value=$(cat KERNEL_VERSIONS | jq -ncR '[inputs | select(length>0)]')" >> $GITHUB_OUTPUT
+
   build:
     name: Build
     runs-on: ubuntu-20.04
@@ -31,13 +32,11 @@ jobs:
       - name: "Build Kernel Version ${{ matrix.version }} Target Arch: ${{ matrix.arch }}"
         shell: bash
         run: |
-          version="${{ matrix.version }}"
-          arch="${{ matrix.arch }}"
-          docker buildx build --build-arg KERNEL_VERSION=${version} \
-            --build-arg ARCH="${arch}" \
+          docker build --build-arg KERNEL_VERSION=${{ matrix.version }} \
+            --build-arg ARCH="${{ matrix.arch }}" \
             --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
-            -t "linux-headers:${version}-${arch}" .
-          docker run --rm -v ${{ github.workspace }}/builds:/output linux-headers:${version}-${arch}
+            -t linux-headers:${{ matrix.version }}-${{ matrix.arch }} .
+          docker run --rm -v ${{ github.workspace }}/builds:/output linux-headers:${{ matrix.version }}-${{ matrix.arch }}
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
