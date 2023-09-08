@@ -36,9 +36,7 @@ jobs:
           docker buildx build --build-arg KERNEL_VERSION=${version} \
             --build-arg ARCH="${arch}" \
             --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
-            -t "linux-headers:${version}-${arch}" \
-            --cache-to type=gha \
-            --cache-from type=gha .
+            -t "linux-headers:${version}-${arch}" .
           docker run --rm -v ${{ github.workspace }}/builds:/output linux-headers:${version}-${arch}
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
