@@ -24,6 +24,21 @@ jobs:
         arch: ["x86_64", "arm64"]
         version: ${{ fromJson(needs.prepare.outputs.kernel_versions) }}
     steps:
-      - name: test
-        run: |
-          echo "${{ matrix.arch }}: ${{ matrix.version }}"
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: "Build Kernel Version ${{ matrix.version }} (Arch: ${{ matrix.arch }})"
+        uses: docker/build-push-action@v4
+        with:
+          push: false
+          tags: linux-headers:${{ matrix.version }}-${{ matrix.arch }}
+          context: .
+          build-args:
+            - KERNEL_VERSION=${{ matrix.version }}
+            - ARCH=${{ matrix.arch }}
+            - CROSS_COMPILE=${{ matrix.arch == 'arm64' ? 'aarch64-linux-gnu-' : '' }}
+      - name: Retrieve Output
+        run: docker run --rm -v $PWD/.builds:/output linux-headers:{{ matric.version }}-${{ matrix.arch }}
+      - name: Test
+        run: ls -lah $PWD/.builds
