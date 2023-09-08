@@ -32,7 +32,7 @@ jobs:
         shell: bash
         run: |
           version="${{ matrix.version }}"
-          arch="${{ matrix.version }}"
+          arch="${{ matrix.arch }}"
           docker buildx build --build-arg KERNEL_VERSION=${version} \
             --build-arg ARCH="${arch}" \
             --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
