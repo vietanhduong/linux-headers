@@ -5,6 +5,10 @@ on:
     tags:
       - v*
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   prepare:
     name: Prepare
@@ -102,4 +106,3 @@ jobs:
           artifacts: "*.tar.gz"
           body: ${{ steps.body.outputs.value }}
           tag: ${{ needs.prepare.outputs.version_tag }}
-          token: ${{ secrets.GH_PAT }}
