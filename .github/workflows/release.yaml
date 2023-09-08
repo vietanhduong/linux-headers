@@ -37,8 +37,8 @@ jobs:
     needs: prepare
     strategy:
       matrix:
-        version: ${{ fromJson(needs.prepare.outputs.kernel_versions ) }}
-        arch: ${{ fromJson(needs.prepare.outputs.target_archs ) }}
+        version: ${{ fromJson(needs.prepare.outputs.kernel_versions) }}
+        arch: ${{ fromJson(needs.prepare.outputs.target_arches) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
