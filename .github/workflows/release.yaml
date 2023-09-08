@@ -37,7 +37,7 @@ jobs:
           build-args:
             - KERNEL_VERSION=${{ matrix.version }}
             - ARCH=${{ matrix.arch }}
-            - CROSS_COMPILE=${{ matrix.arch == 'arm64' ? 'aarch64-linux-gnu-' : '' }}
+            - CROSS_COMPILE=${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}
       - name: Retrieve Output
         run: docker run --rm -v $PWD/.builds:/output linux-headers:{{ matric.version }}-${{ matrix.arch }}
       - name: Test
