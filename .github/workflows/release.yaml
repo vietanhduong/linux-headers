@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: "Build Kernel Version ${{ matrix.version }} (Arch: ${{ matrix.arch }})"
+      - name: "Build with Target Arch: ${{ matrix.arch }}"
         shell: bash
         run: |
           KERNEL_VERSIONS=($(cat KERNEL_VERSIONS))
@@ -37,15 +37,7 @@ jobs:
               --build-arg CROSS_COMPILE="${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}" \
               -t "linux-headers:${version}-${{ matrix.arch }}" \
               --cache-to type=gha \
-              --cache-from type=gha . &
-              pids[${i}]=$!
-          done
-
-          for pid in ${pids[*]}; do
-            wait $pid
-          done
-
-          for $version in "${KERNEL_VERSIONS[@]}"; do
+              --cache-from type=gha .
             docker run --rm -v $PWD/.builds:/output linux-headeres:${version}-${{ matrix.arch }}
           done
 
