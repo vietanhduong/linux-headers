@@ -34,10 +34,10 @@ jobs:
           push: false
           tags: linux-headers:${{ matrix.version }}-${{ matrix.arch }}
           context: .
-          build-args:
-            - KERNEL_VERSION=${{ matrix.version }}
-            - ARCH=${{ matrix.arch }}
-            - CROSS_COMPILE=${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}
+          build-args: |
+            KERNEL_VERSION=${{ matrix.version }}
+            ARCH=${{ matrix.arch }}
+            CROSS_COMPILE=${{ matrix.arch == 'arm64' && 'aarch64-linux-gnu-' || '' }}
       - name: Retrieve Output
         run: docker run --rm -v $PWD/.builds:/output linux-headers:{{ matric.version }}-${{ matrix.arch }}
       - name: Test
