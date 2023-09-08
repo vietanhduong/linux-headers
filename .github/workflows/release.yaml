@@ -85,7 +85,6 @@ jobs:
             mv linux-headers-${arch}.tar.gz $ROOT_REPO
           done
       - name: Build Release Body
-        id: body
         shell: bash
         run: |
           kernel_versions=($(cat KERNEL_VERSIONS))
@@ -99,10 +98,9 @@ jobs:
           for version in "${target_arches[@]}"; do
             md+="* $version\n"
           done
-          echo "value=$md" >> $GITHUB_OUTPUT
-
+          echo -ne "$md" > ${{ github.workspace }}/body.md
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "*.tar.gz"
-          body: ${{ steps.body.outputs.value }}
+          bodyFile: ${{ github.workspace }}/body.md
           tag: ${{ needs.prepare.outputs.version_tag }}
